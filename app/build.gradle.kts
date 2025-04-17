@@ -33,6 +33,12 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+    buildFeatures {
+        compose = true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.14"
+    }
 }
 
 dependencies {
@@ -42,7 +48,15 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.ui.graphics.android)
+    implementation(libs.androidx.foundation.android)
+    implementation(libs.androidx.material3.android)
+    implementation(libs.androidx.ui.tooling.preview.android)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.media3.common.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    debugImplementation(libs.androidx.ui.tooling)
 }
