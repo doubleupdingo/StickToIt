@@ -2,9 +2,6 @@ package edu.quinnipiac.ser210.sticktoitapp.navigation
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -16,17 +13,21 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.media3.common.util.Log
-import androidx.media3.common.util.UnstableApi
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import edu.quinnipiac.ser210.sticktoitapp.screens.HomeScreen
 import edu.quinnipiac.ser210.sticktoitapp.R
 import edu.quinnipiac.ser210.sticktoitapp.screens.CalendarScreen
-
+import edu.quinnipiac.ser210.sticktoitapp.screens.HomeScreen
+import edu.quinnipiac.ser210.sticktoitapp.viewmodel.DateViewModel
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.navigation.compose.currentBackStackEntryAsState
+import edu.quinnipiac.ser210.sticktoitapp.viewmodel.TaskEventViewModel
 
 // Function to add a top bar to the app
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,13 +69,15 @@ fun StickToItAppBar(
 // Function to give navigation to the top bar
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun StickNavigation() {
-    val navController = rememberNavController()
+fun StickNavigation(navController: NavHostController, viewModel: DateViewModel, taskEventViewModel: TaskEventViewModel) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+    val currentScreen = rememberUpdatedState(currentDestination?.route ?: "")
 
     Scaffold(
         topBar = {
             StickToItAppBar(
-                currentScreen = "StickToIt",
+                currentScreen = currentScreen.value,
                 canNavigateBack = navController.previousBackStackEntry != null,
                 navigateUp = { navController.navigateUp() },
                 modifier = Modifier,
@@ -92,10 +95,10 @@ fun StickNavigation() {
                 .padding(innerPadding)
         ) {
             composable(StickScreens.HomeScreen.name) {
-                HomeScreen(navController = navController)
+                HomeScreen(navController = navController, viewModel = viewModel, taskEventViewModel = taskEventViewModel)
             }
             composable(StickScreens.CalendarScreen.name) {
-                CalendarScreen()
+                CalendarScreen(navController = navController, viewModel = viewModel)
             }
         }
     }

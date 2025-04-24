@@ -7,26 +7,31 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import kotlin.math.ceil
-import java.time.*
+import androidx.navigation.NavController
+import java.time.DayOfWeek
+import java.time.YearMonth
 import java.time.format.TextStyle
-import java.util.*
+import java.util.Locale
+import androidx.lifecycle.viewmodel.compose.viewModel
+import edu.quinnipiac.ser210.sticktoitapp.viewmodel.DateViewModel
+import androidx.compose.runtime.collectAsState
+import kotlin.math.ceil
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun CalendarScreen() {
-    // Variables for
-    var currentMonth by remember { mutableStateOf(YearMonth.now()) }
-    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
+fun CalendarScreen(navController: NavController, viewModel: DateViewModel = viewModel()) {
+    val selectedDate by viewModel.selectedDate.collectAsState()
+    val currentMonth by viewModel.currentMonth.collectAsState()
 
     val firstDayOfMonth = currentMonth.atDay(1)
-    val lastDayOfMonth = currentMonth.atEndOfMonth()
-    val daysOfMonth = firstDayOfMonth.lengthOfMonth()
+    val daysOfMonth = currentMonth.lengthOfMonth()
     val dayOfWeekOffset = firstDayOfMonth.dayOfWeek.value % 7
 
     val totalGridDays = dayOfWeekOffset + daysOfMonth
@@ -45,17 +50,30 @@ fun CalendarScreen() {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            IconButton(onClick = { currentMonth = currentMonth.minusMonths(1) }) {
+            IconButton(onClick = {
+                viewModel.changeMonth(currentMonth.minusMonths(1))
+            }) {
                 Text("<")
             }
-            IconButton(onClick = { currentMonth = currentMonth.plusMonths(1) }) {
+            IconButton(onClick = {
+                viewModel.changeMonth(currentMonth.plusMonths(1))
+            }) {
                 Text(">")
             }
         }
 
         // Creates day of week headers
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
-            DayOfWeek.values().forEach {
+            val daysOfWeek = listOf(
+                DayOfWeek.SUNDAY,
+                DayOfWeek.MONDAY,
+                DayOfWeek.TUESDAY,
+                DayOfWeek.WEDNESDAY,
+                DayOfWeek.THURSDAY,
+                DayOfWeek.FRIDAY,
+                DayOfWeek.SATURDAY
+            )
+            daysOfWeek.forEach {
                 Text(
                     it.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
                     modifier = Modifier.weight(1f),
@@ -70,8 +88,8 @@ fun CalendarScreen() {
                 Row(modifier = Modifier.fillMaxWidth()) {
                     for (day in 0..6) {
                         // Calculates date number for this cell
-                        val dayNumber = week * 7 + day - dayOfWeekOffset + 1
-                        val date = if (dayNumber in 1..daysOfMonth) currentMonth.atDay(dayNumber) else null
+                        val dayNumber = week * 7 + day + 1
+                        val date = if (dayNumber > dayOfWeekOffset && dayNumber <= daysOfMonth + dayOfWeekOffset) currentMonth.atDay(dayNumber - dayOfWeekOffset) else null
 
                         // Renders each cell of the calendar
                         Box(
@@ -84,21 +102,20 @@ fun CalendarScreen() {
                                 )
                                 .clickable(enabled = date != null) {
                                     if (date != null) {
-                                        selectedDate = date
-                                        // Todo: Create navigation for going back to homescreen
+                                        viewModel.onDateSelected(date) // Update the date in the viewmodel.
+                                        navController.popBackStack() //navigate back to homescreen.
                                     }
                                 },
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(text = date?.dayOfMonth?.toString() ?: "")
+                            Text(
+                                text = date?.dayOfMonth?.toString() ?: "",
+                                color = if (date == selectedDate) Color.White else Color.Unspecified
+                            )
                         }
                     }
                 }
             }
         }
-
-        // // Spacer and display for selected date
-        Spacer(modifier = Modifier.height(16.dp))
-        Text("Selected date: $selectedDate", style = MaterialTheme.typography.bodyLarge)
     }
 }
