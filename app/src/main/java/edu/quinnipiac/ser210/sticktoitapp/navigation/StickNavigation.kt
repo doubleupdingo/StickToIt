@@ -17,12 +17,15 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.media3.common.util.Log
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.yourapp.ui.HomeScreen
+import edu.quinnipiac.ser210.sticktoitapp.screens.HomeScreen
+import edu.quinnipiac.ser210.sticktoitapp.R
+import edu.quinnipiac.ser210.sticktoitapp.screens.CalendarScreen
 
 
 // Function to add a top bar to the app
@@ -32,7 +35,8 @@ fun StickToItAppBar(
     currentScreen: String,
     canNavigateBack: Boolean,
     navigateUp: () -> Unit,
-    modifier: Modifier
+    modifier: Modifier,
+    onCalendarClick: () -> Unit
 ) {
     TopAppBar(
         title = { Text("StickToIt") },
@@ -45,41 +49,53 @@ fun StickToItAppBar(
                 IconButton(onClick = navigateUp) {
                     Icon(
                         imageVector = Icons.Default.KeyboardArrowUp,
-                        contentDescription = ""
+                        contentDescription = "Back"
                     )
                 }
+            }
+        },
+        actions = {
+            IconButton(onClick = onCalendarClick) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_calendar),
+                    contentDescription = "Open Calendar"
+                )
             }
         }
     )
 }
 
-// Function to give navigation to the top bar (not very useful with one current screen)
+// Function to give navigation to the top bar
 @RequiresApi(Build.VERSION_CODES.O)
-@androidx.annotation.OptIn(UnstableApi::class)
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun StickNavigation() {
     val navController = rememberNavController()
 
-    val canNavigateBack = navController.currentBackStackEntry != null
-    Log.d("canNavigateBack", canNavigateBack.toString())
     Scaffold(
         topBar = {
             StickToItAppBar(
                 currentScreen = "StickToIt",
-                canNavigateBack = canNavigateBack,
+                canNavigateBack = navController.previousBackStackEntry != null,
                 navigateUp = { navController.navigateUp() },
-                modifier = Modifier
+                modifier = Modifier,
+                onCalendarClick = {
+                    navController.navigate(StickScreens.CalendarScreen.name)
+                }
             )
         }
-    ){ innerPadding ->
-        NavHost(navController = navController,
-            startDestination = StickScreens.HomeScreen.name, modifier = Modifier
+    ) { innerPadding ->
+        NavHost(
+            navController = navController,
+            startDestination = StickScreens.HomeScreen.name,
+            modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)) {
-
+                .padding(innerPadding)
+        ) {
             composable(StickScreens.HomeScreen.name) {
                 HomeScreen(navController = navController)
+            }
+            composable(StickScreens.CalendarScreen.name) {
+                CalendarScreen()
             }
         }
     }

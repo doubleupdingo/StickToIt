@@ -1,4 +1,4 @@
-package com.example.yourapp.ui
+package edu.quinnipiac.ser210.sticktoitapp.screens
 
 import android.os.Build
 import androidx.annotation.RequiresApi
