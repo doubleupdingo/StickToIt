@@ -43,6 +43,11 @@ class TaskEventViewModel(private val repository: AppRepository) : ViewModel() {
         repository.deleteEvent(event)
     }
 
+    fun clearAllData() = viewModelScope.launch {
+        repository.getAllTasks().forEach { repository.deleteTask(it) }
+        repository.getAllEvents().forEach { repository.deleteEvent(it) }
+    }
+
     // Get events for a given date, to be used in the home screen.
     suspend fun getEventsByDate(date: LocalDate): List<Event> =
         repository.getEventsByDate(date)

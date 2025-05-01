@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.navigation.compose.currentBackStackEntryAsState
+import edu.quinnipiac.ser210.sticktoitapp.screens.SettingsScreen
 import edu.quinnipiac.ser210.sticktoitapp.viewmodel.TaskEventViewModel
 
 // Function to add a top bar to the app
@@ -37,7 +38,8 @@ fun StickToItAppBar(
     canNavigateBack: Boolean,
     navigateUp: () -> Unit,
     modifier: Modifier,
-    onCalendarClick: () -> Unit
+    onCalendarClick: () -> Unit,
+    onSettingsClick: () -> Unit
 ) {
     TopAppBar(
         title = { Text("StickToIt") },
@@ -62,7 +64,14 @@ fun StickToItAppBar(
                     contentDescription = "Open Calendar"
                 )
             }
+            IconButton(onClick = onSettingsClick) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_settings),
+                    contentDescription = "Open Settings"
+                )
+            }
         }
+
     )
 }
 
@@ -83,8 +92,12 @@ fun StickNavigation(navController: NavHostController, viewModel: DateViewModel, 
                 modifier = Modifier,
                 onCalendarClick = {
                     navController.navigate(StickScreens.CalendarScreen.name)
+                },
+                onSettingsClick = {
+                    navController.navigate(StickScreens.SettingsScreen.name)
                 }
             )
+
         }
     ) { innerPadding ->
         NavHost(
@@ -100,6 +113,10 @@ fun StickNavigation(navController: NavHostController, viewModel: DateViewModel, 
             composable(StickScreens.CalendarScreen.name) {
                 CalendarScreen(navController = navController, viewModel = viewModel)
             }
+            composable(StickScreens.SettingsScreen.name) {
+                SettingsScreen(navController = navController, taskEventViewModel = taskEventViewModel)
+            }
+
         }
     }
 }
