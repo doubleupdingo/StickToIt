@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.navigation.compose.currentBackStackEntryAsState
+import edu.quinnipiac.ser210.sticktoitapp.screens.CreateEntryScreen
 import edu.quinnipiac.ser210.sticktoitapp.screens.SettingsScreen
 import edu.quinnipiac.ser210.sticktoitapp.viewmodel.TaskEventViewModel
 
@@ -39,7 +40,8 @@ fun StickToItAppBar(
     navigateUp: () -> Unit,
     modifier: Modifier,
     onCalendarClick: () -> Unit,
-    onSettingsClick: () -> Unit
+    onSettingsClick: () -> Unit,
+    onCreateEntryClick: () -> Unit
 ) {
     TopAppBar(
         title = { Text("StickToIt") },
@@ -58,6 +60,12 @@ fun StickToItAppBar(
             }
         },
         actions = {
+            IconButton(onClick = onCreateEntryClick) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_add),
+                    contentDescription = "Create Entry"
+                )
+            }
             IconButton(onClick = onCalendarClick) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_calendar),
@@ -95,6 +103,9 @@ fun StickNavigation(navController: NavHostController, viewModel: DateViewModel, 
                 },
                 onSettingsClick = {
                     navController.navigate(StickScreens.SettingsScreen.name)
+                },
+                onCreateEntryClick = {
+                    navController.navigate(StickScreens.CreateEntryScreen.name)
                 }
             )
 
@@ -116,7 +127,9 @@ fun StickNavigation(navController: NavHostController, viewModel: DateViewModel, 
             composable(StickScreens.SettingsScreen.name) {
                 SettingsScreen(navController = navController, taskEventViewModel = taskEventViewModel)
             }
-
+            composable(StickScreens.CreateEntryScreen.name) {
+                CreateEntryScreen(navController = navController, taskEventViewModel = taskEventViewModel)
+            }
         }
     }
 }

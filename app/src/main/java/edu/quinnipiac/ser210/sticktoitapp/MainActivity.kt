@@ -19,6 +19,7 @@ import androidx.navigation.compose.rememberNavController
 import edu.quinnipiac.ser210.sticktoitapp.data.AppDatabase
 import edu.quinnipiac.ser210.sticktoitapp.data.AppRepository
 import edu.quinnipiac.ser210.sticktoitapp.navigation.StickNavigation
+import edu.quinnipiac.ser210.sticktoitapp.screens.CreateEntryScreen
 import edu.quinnipiac.ser210.sticktoitapp.ui.theme.StickToItAppTheme
 import edu.quinnipiac.ser210.sticktoitapp.viewmodel.DateViewModel
 import edu.quinnipiac.ser210.sticktoitapp.viewmodel.TaskEventViewModel
@@ -59,6 +60,6 @@ class MainActivity : ComponentActivity() {
 //@Composable
 //fun StickToItPreview() {
 //    StickToItAppTheme {
-//        StickNavigation()
+//        CreateEntryScreen(navController = rememberNavController())
 //    }
 //}

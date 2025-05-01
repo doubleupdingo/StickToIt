@@ -2,12 +2,13 @@
 agp = "8.8.0"
 core = "1.6.1"
 coreTesting = "2.2.0"
+datastorePreferences = "1.1.5"
 hiltAndroid = "2.50"
 kotlin = "2.0.0"
 coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
-espressoCore = "3.6.1"
+espressoCore = "3.5.0"
 appcompat = "1.7.0"
 kotlinStdlib = "2.1.10"
 kotlinxCoroutinesTest = "1.8.0"
@@ -27,12 +28,17 @@ navigationCompose = "2.8.9"
 media3CommonKtx = "1.6.1"
 junitKtx = "1.2.1"
 runner = "1.6.2"
+datastoreCoreAndroid = "1.1.5"
+datastorePreferencesCoreAndroid = "1.1.5"
+uiTestJunit4Android = "1.8.0"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity" }
 androidx-core = { module = "androidx.test:core", version.ref = "core" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "coreTesting" }
+androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
+androidx-datastore-preferences-core = { module = "androidx.datastore:datastore-preferences-core", version.ref = "datastorePreferences" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
 androidx-room-compiler-v252 = { module = "androidx.room:room-compiler", version.ref = "roomCompiler" }
 androidx-room-compiler-v270 = { module = "androidx.room:room-compiler", version.ref = "roomCompilerVersion" }
@@ -59,6 +65,9 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 androidx-media3-common-ktx = { group = "androidx.media3", name = "media3-common-ktx", version.ref = "media3CommonKtx" }
 androidx-junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "junitKtx" }
 androidx-runner = { group = "androidx.test", name = "runner", version.ref = "runner" }
+androidx-datastore-core-android = { group = "androidx.datastore", name = "datastore-core-android", version.ref = "datastoreCoreAndroid" }
+androidx-datastore-preferences-core-android = { group = "androidx.datastore", name = "datastore-preferences-core-android", version.ref = "datastorePreferencesCoreAndroid" }
+androidx-ui-test-junit4-android = { group = "androidx.compose.ui", name = "ui-test-junit4-android", version.ref = "uiTestJunit4Android" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -2,11 +2,14 @@ package edu.quinnipiac.ser210.sticktoitapp.screens
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -20,10 +23,6 @@ import java.util.*
 import edu.quinnipiac.ser210.sticktoitapp.data.Event
 import edu.quinnipiac.ser210.sticktoitapp.data.Task
 import edu.quinnipiac.ser210.sticktoitapp.viewmodel.DateViewModel
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import edu.quinnipiac.ser210.sticktoitapp.viewmodel.TaskEventViewModel
 import kotlinx.coroutines.launch
 
@@ -44,12 +43,19 @@ fun HomeScreen(
 
     val coroutineScope = rememberCoroutineScope()
 
+    var refreshList by remember { mutableStateOf(false) }
+
     // Event and task lists
     var events by remember { mutableStateOf<List<Event>>(emptyList()) }
     var tasks by remember { mutableStateOf<List<Task>>(emptyList()) }
 
+    // Variables to hold selected events/tasks & state of the dialog
+    var selectedEvent by remember { mutableStateOf<Event?>(null) }
+    var selectedTask by remember { mutableStateOf<Task?>(null) }
+    var showDialog by remember { mutableStateOf(false) }
+
     // Runs when a new date is selected
-    LaunchedEffect(key1 = selectedDate) {
+    LaunchedEffect(key1 = selectedDate, key2 = refreshList) {
         coroutineScope.launch {
             // Defaults to current date if selected date is somehow null
             val tempSelectedDate = selectedDate ?: LocalDate.now()
@@ -57,7 +63,28 @@ fun HomeScreen(
             // Gets the events and tasks for the selected date
             events = taskEventViewModel.getEventsByDate(tempSelectedDate)
             tasks = taskEventViewModel.getTasksByDate(tempSelectedDate)
+            refreshList = false
         }
+    }
+
+    // Show dialog if an event or task is selected
+    if (showDialog) {
+        EventTaskDialog(
+            event = selectedEvent,
+            task = selectedTask,
+            onDismiss = {
+                showDialog = false
+                selectedEvent = null
+                selectedTask = null
+            },
+            onComplete = {
+                showDialog = false
+                selectedEvent = null
+                selectedTask = null
+                refreshList = true
+            },
+            taskEventViewModel = taskEventViewModel
+        )
     }
 
     // Column for all UI
@@ -92,11 +119,23 @@ fun HomeScreen(
 
         // Event & Task lists
         SectionTitle("Today's Events:")
-        EventListSection(items = events)
+        EventListSection(
+            items = events,
+            onEventClicked = { event ->
+                selectedEvent = event
+                showDialog = true
+            }
+        )
         Spacer(modifier = Modifier.height(16.dp))
 
         SectionTitle("Today's Tasks:")
-        TaskListSection(items = tasks)
+        TaskListSection(
+            items = tasks,
+            onTaskClicked = { task ->
+                selectedTask = task
+                showDialog = true
+            }
+        )
         Spacer(modifier = Modifier.height(16.dp))
 
         // Previous & Next day buttons at bottom of screen
@@ -139,8 +178,9 @@ fun SectionTitle(title: String) {
 }
 
 // Formatting for the event list (lazy column)
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun EventListSection(items: List<Event>) {
+fun EventListSection(items: List<Event>, onEventClicked: (Event) -> Unit) {
     Surface(
         tonalElevation = 4.dp,
         shape = MaterialTheme.shapes.medium,
@@ -152,15 +192,22 @@ fun EventListSection(items: List<Event>) {
             modifier = Modifier.padding(8.dp)
         ) {
             items(items) { item ->
-                Text(text = item.title, modifier = Modifier.padding(4.dp))
+                //Added clickable
+                Text(
+                    text = item.title,
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .clickable { onEventClicked(item) }
+                )
             }
         }
     }
 }
 
 // Formatting for the task list (lazy column)
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun TaskListSection(items: List<Task>) {
+fun TaskListSection(items: List<Task>, onTaskClicked: (Task) -> Unit) {
     Surface(
         tonalElevation = 4.dp,
         shape = MaterialTheme.shapes.medium,
@@ -172,8 +219,66 @@ fun TaskListSection(items: List<Task>) {
             modifier = Modifier.padding(8.dp)
         ) {
             items(items) { item ->
-                Text(text = item.title, modifier = Modifier.padding(4.dp))
+                //added clickable
+                Text(
+                    text = item.title,
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .clickable { onTaskClicked(item) }
+                )
             }
         }
     }
+}
+
+// Function to handle dialog box popup when a task or event is selected
+// Can view details, as well as mark it as complete (aka delete it)
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun EventTaskDialog(
+    event: Event? = null,
+    task: Task? = null,
+    onDismiss: () -> Unit,
+    onComplete: () -> Unit,
+    taskEventViewModel: TaskEventViewModel
+) {
+    if (event == null && task == null) {
+        onDismiss() // Dismiss if no event or task present (essentially never opens)
+        return
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = event?.title ?: task?.title ?: "Details") },
+        text = {
+            Column {
+                if (event != null) {
+                    Text("Start Time: ${event.startTime.format(DateTimeFormatter.ofPattern("h:mm a"))}")
+                    Text("End Time: ${event.endTime.format(DateTimeFormatter.ofPattern("h:mm a"))}")
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text("Description: ${event.description}")
+                } else if (task != null) {
+                    Text("Description: ${task.description}")
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                if (event != null) {
+                    taskEventViewModel.deleteEvent(event)
+                } else if (task != null) {
+                    taskEventViewModel.deleteTask(task)
+                }
+                onComplete()
+                onDismiss()
+            }) {
+                Text("Mark as Complete")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Close")
+            }
+        }
+    )
 }
