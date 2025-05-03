@@ -15,6 +15,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -29,7 +30,9 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.navigation.compose.currentBackStackEntryAsState
 import edu.quinnipiac.ser210.sticktoitapp.screens.CreateEntryScreen
 import edu.quinnipiac.ser210.sticktoitapp.screens.SettingsScreen
+import edu.quinnipiac.ser210.sticktoitapp.viewmodel.SettingsViewModel
 import edu.quinnipiac.ser210.sticktoitapp.viewmodel.TaskEventViewModel
+import edu.quinnipiac.ser210.sticktoitapp.ui.theme.DarkBlue40
 
 // Function to add a top bar to the app
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,9 +47,11 @@ fun StickToItAppBar(
     onCreateEntryClick: () -> Unit
 ) {
     TopAppBar(
-        title = { Text("StickToIt") },
-        colors = TopAppBarDefaults.mediumTopAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primary
+        title = { Text("StickToIt", color = Color.Black) },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = DarkBlue40,
+            navigationIconContentColor = Color.Black,
+            actionIconContentColor = Color.Black
         ),
         modifier = modifier,
         navigationIcon = {
@@ -54,7 +59,8 @@ fun StickToItAppBar(
                 IconButton(onClick = navigateUp) {
                     Icon(
                         imageVector = Icons.Default.KeyboardArrowUp,
-                        contentDescription = "Back"
+                        contentDescription = "Back",
+                        tint = Color.Black
                     )
                 }
             }
@@ -63,30 +69,37 @@ fun StickToItAppBar(
             IconButton(onClick = onCreateEntryClick) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_add),
-                    contentDescription = "Create Entry"
+                    contentDescription = "Create Entry",
+                    tint = Color.Black
                 )
             }
             IconButton(onClick = onCalendarClick) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_calendar),
-                    contentDescription = "Open Calendar"
+                    contentDescription = "Open Calendar",
+                    tint = Color.Black
                 )
             }
             IconButton(onClick = onSettingsClick) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_settings),
-                    contentDescription = "Open Settings"
+                    contentDescription = "Open Settings",
+                    tint = Color.Black
                 )
             }
         }
-
     )
 }
 
 // Function to give navigation to the top bar
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun StickNavigation(navController: NavHostController, viewModel: DateViewModel, taskEventViewModel: TaskEventViewModel) {
+fun StickNavigation(
+    navController: NavHostController,
+    dateViewModel: DateViewModel,
+    taskEventViewModel: TaskEventViewModel,
+    settingsViewModel: SettingsViewModel
+) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
     val currentScreen = rememberUpdatedState(currentDestination?.route ?: "")
@@ -108,7 +121,6 @@ fun StickNavigation(navController: NavHostController, viewModel: DateViewModel, 
                     navController.navigate(StickScreens.CreateEntryScreen.name)
                 }
             )
-
         }
     ) { innerPadding ->
         NavHost(
@@ -119,13 +131,13 @@ fun StickNavigation(navController: NavHostController, viewModel: DateViewModel, 
                 .padding(innerPadding)
         ) {
             composable(StickScreens.HomeScreen.name) {
-                HomeScreen(navController = navController, viewModel = viewModel, taskEventViewModel = taskEventViewModel)
+                HomeScreen(navController = navController, viewModel = dateViewModel, taskEventViewModel = taskEventViewModel, settingsViewModel = settingsViewModel)
             }
             composable(StickScreens.CalendarScreen.name) {
-                CalendarScreen(navController = navController, viewModel = viewModel)
+                CalendarScreen(navController = navController, viewModel = dateViewModel)
             }
             composable(StickScreens.SettingsScreen.name) {
-                SettingsScreen(navController = navController, taskEventViewModel = taskEventViewModel)
+                SettingsScreen(navController = navController, taskEventViewModel = taskEventViewModel, settingsViewModel = settingsViewModel)
             }
             composable(StickScreens.CreateEntryScreen.name) {
                 CreateEntryScreen(navController = navController, taskEventViewModel = taskEventViewModel)

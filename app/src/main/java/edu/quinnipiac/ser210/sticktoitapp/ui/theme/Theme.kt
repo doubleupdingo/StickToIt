@@ -8,10 +8,15 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
+// Custom blues
+val DarkBlue80 = Color(0xFF214161)
+val DarkBlue40 = Color(0xFF416181)
+
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
+    primary = DarkBlue80,
     secondary = PurpleGrey80,
     tertiary = Pink80
 )

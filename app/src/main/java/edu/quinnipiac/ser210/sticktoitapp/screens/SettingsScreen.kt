@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -16,22 +14,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import edu.quinnipiac.ser210.sticktoitapp.viewmodel.SettingsViewModel
 import edu.quinnipiac.ser210.sticktoitapp.viewmodel.TaskEventViewModel
 import kotlinx.coroutines.launch
-import java.time.format.DateTimeFormatter
 
 // Composable function for settings screen
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SettingsScreen(
     navController: NavController,
-    taskEventViewModel: TaskEventViewModel
+    taskEventViewModel: TaskEventViewModel,
+    settingsViewModel: SettingsViewModel = viewModel()
 ) {
     val coroutineScope = rememberCoroutineScope()
 
-    var darkModeEnabled by remember { mutableStateOf(false) }
-    var militaryTimeEnabled by remember { mutableStateOf(false) }
+    val darkModeEnabled by settingsViewModel.darkModeEnabled.collectAsState()
+    val militaryTimeEnabled by settingsViewModel.militaryTimeEnabled.collectAsState()
 
     Column(
         modifier = Modifier
@@ -63,7 +63,7 @@ fun SettingsScreen(
                 Text("Dark Mode", style = MaterialTheme.typography.bodyLarge)
                 Switch(
                     checked = darkModeEnabled,
-                    onCheckedChange = { darkModeEnabled = it }
+                    onCheckedChange = { settingsViewModel.setDarkModeEnabled(it) }
                 )
             }
 
@@ -78,7 +78,7 @@ fun SettingsScreen(
                 Text("Military Time on Home Screen", style = MaterialTheme.typography.bodyLarge)
                 Switch(
                     checked = militaryTimeEnabled,
-                    onCheckedChange = { militaryTimeEnabled = it }
+                    onCheckedChange = { settingsViewModel.setMilitaryTimeEnabled(it) }
                 )
             }
         }

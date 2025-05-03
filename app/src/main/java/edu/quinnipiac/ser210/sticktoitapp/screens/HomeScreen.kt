@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import java.time.LocalDate
 import java.time.LocalTime
@@ -23,6 +24,7 @@ import java.util.*
 import edu.quinnipiac.ser210.sticktoitapp.data.Event
 import edu.quinnipiac.ser210.sticktoitapp.data.Task
 import edu.quinnipiac.ser210.sticktoitapp.viewmodel.DateViewModel
+import edu.quinnipiac.ser210.sticktoitapp.viewmodel.SettingsViewModel
 import edu.quinnipiac.ser210.sticktoitapp.viewmodel.TaskEventViewModel
 import kotlinx.coroutines.launch
 
@@ -31,15 +33,23 @@ import kotlinx.coroutines.launch
 fun HomeScreen(
     navController: NavHostController,
     viewModel: DateViewModel,
-    taskEventViewModel: TaskEventViewModel
+    taskEventViewModel: TaskEventViewModel,
+    settingsViewModel: SettingsViewModel = viewModel()
 ) {
     val selectedDate by viewModel.selectedDate.collectAsState()
-
     val displayDate = selectedDate
 
-    val currentTime = remember {
-        LocalTime.now().format(DateTimeFormatter.ofPattern("h:mm a", Locale.getDefault()))
+    val militaryTimeEnabled by settingsViewModel.militaryTimeEnabled.collectAsState()
+
+    // Changed to conditional formatting
+    val timeFormatter = if (militaryTimeEnabled) {
+        DateTimeFormatter.ofPattern("HH:mm", Locale.getDefault())
+    } else {
+        DateTimeFormatter.ofPattern("h:mm a", Locale.getDefault())
     }
+    val currentTime = remember {
+        LocalTime.now()
+    }.format(timeFormatter)
 
     val coroutineScope = rememberCoroutineScope()
 

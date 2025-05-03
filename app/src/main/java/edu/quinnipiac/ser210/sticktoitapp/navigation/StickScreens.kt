@@ -5,4 +5,5 @@ enum class StickScreens {
     CalendarScreen,
     SettingsScreen,
     CreateEntryScreen
+    // SplashScreen not included due to it not being involved in regular navigation
 }

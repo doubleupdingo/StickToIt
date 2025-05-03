@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -22,6 +24,7 @@ import edu.quinnipiac.ser210.sticktoitapp.navigation.StickNavigation
 import edu.quinnipiac.ser210.sticktoitapp.screens.CreateEntryScreen
 import edu.quinnipiac.ser210.sticktoitapp.ui.theme.StickToItAppTheme
 import edu.quinnipiac.ser210.sticktoitapp.viewmodel.DateViewModel
+import edu.quinnipiac.ser210.sticktoitapp.viewmodel.SettingsViewModel
 import edu.quinnipiac.ser210.sticktoitapp.viewmodel.TaskEventViewModel
 
 
@@ -30,7 +33,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            StickToItAppTheme {
+            val settingsViewModel = viewModel<SettingsViewModel>()
+            val isDarkMode by settingsViewModel.darkModeEnabled.collectAsState()
+            StickToItAppTheme(darkTheme = isDarkMode) {
                 Surface(
                 modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colorScheme.background
@@ -47,7 +52,7 @@ class MainActivity : ComponentActivity() {
 
                     val navController = rememberNavController()
 
-                    StickNavigation(navController, dateViewModel, taskEventViewModel)
+                    StickNavigation(navController, dateViewModel, taskEventViewModel, settingsViewModel)
                 }
             }
         }

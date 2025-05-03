@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.androidx.datastore.preferences.core)
     implementation(libs.androidx.datastore.preferences.core.android)
     implementation(libs.androidx.ui.test.junit4.android)
+    implementation(libs.androidx.navigation.testing)
     ksp(libs.androidx.room.compiler.v270)
     testImplementation(libs.junit)
     testImplementation(libs.androidx.room.testing)
